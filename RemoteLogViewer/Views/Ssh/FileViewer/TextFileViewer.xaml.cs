@@ -7,6 +7,11 @@ using WinRT.Interop;
 using RemoteLogViewer.ViewModels.Ssh.FileViewer;
 using System.Threading;
 using System.IO;
+using Microsoft.UI.Xaml.Documents;
+using Microsoft.UI.Xaml.Media;
+using RemoteLogViewer.Services.Viewer;
+using Windows.UI;
+using System.Collections.Generic;
 
 namespace RemoteLogViewer.Views.Ssh.FileViewer;
 
@@ -23,6 +28,16 @@ public sealed partial class TextFileViewer {
 			}
 			field.WindowStartLine.Subscribe(x => {
 				this.VirtualScrollViewer.ScrollToVerticalOffset(x * LineHeight);
+			});
+			field.Lines.Subscribe(lines => {
+				var dq = this.DispatcherQueue;
+				if (dq.HasThreadAccess) {
+					// 既に UI スレッド
+					this.ApplyLinesToRichTextBlock(lines);
+				} else {
+					// UI スレッドへディスパッチ
+					_ = dq.TryEnqueue(() => this.ApplyLinesToRichTextBlock(lines));
+				}
 			});
 		}
 	}
@@ -116,8 +131,53 @@ public sealed partial class TextFileViewer {
 			return;
 		}
 		if (sender is HyperlinkButton btn && long.TryParse(btn.Content?.ToString(), out var line)) {
-			this.ViewModel.SelectedTextLine.Value = this.ViewModel.Lines.FirstOrDefault(ln => ln.LineNumber == line);
+			this.ViewModel.SelectedTextLine.Value = this.ViewModel.Lines.CurrentValue.FirstOrDefault(ln => ln.LineNumber == line);
 			this.BottomTabView.SelectedItem = this.SelectedLineView;
+		}
+	}
+
+	private readonly Dictionary<Color, SolidColorBrush> _brushCache = new();
+	private SolidColorBrush GetBrush(Color c) {
+		if (this._brushCache.TryGetValue(c, out var b)) {
+			return b;
+		}
+		b = new SolidColorBrush(c);
+		this._brushCache[c] = b;
+		return b;
+	}
+
+	// RichTextBlockへの反映
+	private void ApplyLinesToRichTextBlock(HighlightedTextLine[] lines) {
+		if (this.ContentRichTextBlock == null) {
+			return;
+		}
+		var blocks = this.ContentRichTextBlock.Blocks;
+		blocks.Clear();
+		if (lines.Length == 0) {
+			return;
+		}
+		foreach (var line in lines) {
+			var para = new Paragraph();
+			foreach (var segment in line.StyledTexts) {
+				if (segment.Text.Length == 0) {
+					continue;
+				}
+				var foreColor = segment.Style.ForeColor ?? line.LineStyle.ForeColor;
+				var backColor = segment.Style.BackColor ?? line.LineStyle.BackColor;
+				var run = new Run {
+					Text = segment.Text.Replace(" ", "\u00A0"),
+					Foreground = this.GetBrush(foreColor ?? Color.FromArgb(255, 0, 0, 0)),
+				};
+				var inlineUIContainer = new InlineUIContainer();
+				var border = new Border();
+				var textBlock = new TextBlock();
+				para.Inlines.Add(inlineUIContainer);
+				inlineUIContainer.Child = border;
+				border.Child = textBlock;
+				border.Background = this.GetBrush(backColor ?? Color.FromArgb(0, 0, 0, 0));
+				textBlock.Inlines.Add(run);
+			}
+			blocks.Add(para);
 		}
 	}
 }

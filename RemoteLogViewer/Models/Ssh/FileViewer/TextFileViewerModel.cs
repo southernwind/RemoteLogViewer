@@ -33,8 +33,7 @@ public class TextFileViewerModel : ModelBase {
 		lineNumbersChangedStream.Subscribe(x => {
 			Debug.WriteLine($"lineNumbersChanged start:{x.lineNumbers.FirstOrDefault()}");
 			lock (this._syncObj) {
-				this.Lines.Clear();
-				this.Lines.AddRange(x.lineNumbers.Select((num, i) => this.LoadedLines.TryGetValue(num, out var val) ? val : new TextLine(num, "", false)));
+				this.Lines.Value = [.. x.lineNumbers.Select((num, i) => this.LoadedLines.TryGetValue(num, out var val) ? val : new TextLine(num, "", false))];
 			}
 			Debug.WriteLine("lineNumbersChanged end");
 		});
@@ -56,11 +55,11 @@ public class TextFileViewerModel : ModelBase {
 			.Subscribe(x => {
 				Debug.WriteLine($"loadedLines updated start:{x.NewItem.Value.LineNumber}");
 				lock (this._syncObj) {
-					foreach (var (tl, i) in this.Lines.Select((tl, i) => (tl, i)).ToArray()) {
+					foreach (var (tl, i) in this.Lines.Value.Select((tl, i) => (tl, i)).ToArray()) {
 						if (tl.LineNumber != x.NewItem.Value.LineNumber) {
 							continue;
 						}
-						this.Lines[i] = x.NewItem.Value;
+						this.Lines.Value[i] = x.NewItem.Value;
 					}
 				}
 				Debug.WriteLine($"loadedLines updated end");
@@ -84,7 +83,7 @@ public class TextFileViewerModel : ModelBase {
 	/// <summary>
 	/// 表示行。
 	/// </summary>
-	public ObservableList<TextLine> Lines {
+	public ReactiveProperty<TextLine[]> Lines {
 		get;
 	} = new();
 
@@ -283,7 +282,7 @@ public class TextFileViewerModel : ModelBase {
 		this.OpenedFilePath.Value = null;
 		this.GrepResults.Clear();
 		this.LoadedLines.Clear();
-		this.Lines.Clear();
+		this.Lines.Value = [];
 		this._byteOffsetIndex.Reset();
 		this.SaveRangeOperation.Reset();
 		this.BuildByteOffsetMapOperation.Reset();
