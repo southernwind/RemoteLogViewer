@@ -21,7 +21,7 @@ public class GrepOperationTests {
 		var subject = new Subject<TextLine>();
 		var sshMock = new Mock<ISshService>();
 		sshMock.Setup(s => s.GrepAsync("file.log", "ERR", null, 100, It.IsAny<ByteOffset>(), 1, false, false, It.IsAny<CancellationToken>()))
-			.Returns((string _, string _, bool _, string? _, int _, ByteOffset bo, long _, CancellationToken t) => subject.ToAsyncEnumerable(t));
+			.Returns((string _, string _, string? _, int _, ByteOffset bo, long _, bool _, bool _, CancellationToken t) => subject.ToAsyncEnumerable(t));
 
 		using var opRegistry = new OperationRegistry();
 		var loggerMock = new Mock<ILogger<GrepOperation>>();
@@ -64,7 +64,7 @@ public class GrepOperationTests {
 		var subject = new Subject<TextLine>();
 		var sshMock = new Mock<ISshService>();
 		sshMock.Setup(s => s.GrepAsync("file.log", "ERR", null, 100, It.IsAny<ByteOffset>(), 1, false, false, It.IsAny<CancellationToken>()))
-			.Returns((string _, string _, bool _, string? _, int _, ByteOffset bo, long _, CancellationToken t) => subject.ToAsyncEnumerable(t));
+			.Returns((string _, string _, string? _, int _, ByteOffset bo, long _, bool _, bool _, CancellationToken t) => subject.ToAsyncEnumerable(t));
 
 		using var opRegistry = new OperationRegistry();
 		var loggerMock = new Mock<ILogger<GrepOperation>>();

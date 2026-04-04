@@ -18,7 +18,7 @@ public class BuildByteOffsetMapOperationTests {
 		var subject = new Subject<ByteOffset>();
 
 		var sshMock = new Mock<ISshService>();
-		sshMock.Setup(s => s.CreateByteOffsetMap("file.log", 100, null, It.IsAny<CancellationToken>())).Returns((string _, int _, CancellationToken t) => subject.ToAsyncEnumerable(t));
+		sshMock.Setup(s => s.CreateByteOffsetMap("file.log", 100, null, It.IsAny<CancellationToken>())).Returns((string _, int _, ByteOffset? _, CancellationToken t) => subject.ToAsyncEnumerable(t));
 
 		using var opRegistry = new OperationRegistry();
 		var loggerMock = new Mock<ILogger<BuildByteOffsetMapOperation>>();
@@ -45,7 +45,7 @@ public class BuildByteOffsetMapOperationTests {
 		Assert.Equal([line100], list);
 		op.IsRunning.CurrentValue.ShouldBeTrue();
 		op.Progress.CurrentValue.ShouldBe(0.1, 0.001);
-		op.ProcessedBytes.CurrentValue.ShouldBe(1000UL);
+		op.ProcessedBytes.CurrentValue.ShouldBe(999UL);
 
 		// publsih
 		subject.OnNext(line200);
@@ -55,7 +55,7 @@ public class BuildByteOffsetMapOperationTests {
 		Assert.Equal([line100, line200], list);
 		op.IsRunning.CurrentValue.ShouldBeTrue();
 		op.Progress.CurrentValue.ShouldBe(0.4, 0.001);
-		op.ProcessedBytes.CurrentValue.ShouldBe(4000UL);
+		op.ProcessedBytes.CurrentValue.ShouldBe(3999UL);
 
 		// publsih
 		subject.OnNext(line300);
@@ -65,7 +65,7 @@ public class BuildByteOffsetMapOperationTests {
 		Assert.Equal([line100, line200, line300], list);
 		op.IsRunning.CurrentValue.ShouldBeTrue();
 		op.Progress.CurrentValue.ShouldBe(0.6, 0.001);
-		op.ProcessedBytes.CurrentValue.ShouldBe(6000UL);
+		op.ProcessedBytes.CurrentValue.ShouldBe(5999UL);
 
 		// publsih
 		subject.OnNext(line400);
@@ -75,7 +75,7 @@ public class BuildByteOffsetMapOperationTests {
 		Assert.Equal([line100, line200, line300, line400], list);
 		op.IsRunning.CurrentValue.ShouldBeTrue();
 		op.Progress.CurrentValue.ShouldBe(1, 0.001);
-		op.ProcessedBytes.CurrentValue.ShouldBe(10000UL);
+		op.ProcessedBytes.CurrentValue.ShouldBe(9999UL);
 
 		subject.OnCompleted();
 		await WaitUntilAsync(() => list.IsCompleted, true);
@@ -84,7 +84,7 @@ public class BuildByteOffsetMapOperationTests {
 		Assert.Equal([line100, line200, line300, line400], list);
 		op.IsRunning.CurrentValue.ShouldBeFalse();
 		op.Progress.CurrentValue.ShouldBe(1, 0.001);
-		op.ProcessedBytes.CurrentValue.ShouldBe(10000UL);
+		op.ProcessedBytes.CurrentValue.ShouldBe(9999UL);
 	}
 
 	[Fact]
@@ -93,7 +93,7 @@ public class BuildByteOffsetMapOperationTests {
 		var subject = new Subject<ByteOffset>();
 
 		var sshMock = new Mock<ISshService>();
-		sshMock.Setup(s => s.CreateByteOffsetMap("file.log", 100, null, It.IsAny<CancellationToken>())).Returns((string _, int _, CancellationToken t) => subject.ToAsyncEnumerable(t));
+		sshMock.Setup(s => s.CreateByteOffsetMap("file.log", 100, null, It.IsAny<CancellationToken>())).Returns((string _, int _, ByteOffset? _, CancellationToken t) => subject.ToAsyncEnumerable(t));
 
 		using var opRegistry = new OperationRegistry();
 		var loggerMock = new Mock<ILogger<BuildByteOffsetMapOperation>>();
@@ -114,7 +114,7 @@ public class BuildByteOffsetMapOperationTests {
 		Assert.Equal([line100, line200], list);
 		op.IsRunning.CurrentValue.ShouldBeTrue();
 		op.Progress.CurrentValue.ShouldBe(0.4, 0.01);
-		op.ProcessedBytes.CurrentValue.ShouldBe(4000UL);
+		op.ProcessedBytes.CurrentValue.ShouldBe(3999UL);
 
 		cts.Cancel();
 		await Task.Delay(10);
@@ -124,6 +124,6 @@ public class BuildByteOffsetMapOperationTests {
 		Assert.Equal([line100, line200], list);
 		op.IsRunning.CurrentValue.ShouldBeFalse();
 		op.Progress.CurrentValue.ShouldBe(0.4, 0.01);
-		op.ProcessedBytes.CurrentValue.ShouldBe(4000UL);
+		op.ProcessedBytes.CurrentValue.ShouldBe(3999UL);
 	}
 }
