@@ -135,13 +135,17 @@ public class HighlightService {
 
 		var styledIndex = -1;
 		List<PointStyle> applying = [];
+
+		var startsLookup = mergedWordStyles.ToLookup(x => x.Start);
+		var endsLookup = mergedWordStyles.ToLookup(x => x.End + 1);
+
 		// スタイルの付け替えが発生する可能性のあるindexを列挙
 		foreach (var index in mergedWordStyles.SelectMany(x => new int[] { x.Start, x.End + 1 }).OrderBy(x => x).Distinct()) {
 			_ = sb.Append(Escape(content[(styledIndex + 1)..index]));
 			styledIndex = index - 1;
 
-			var starts = mergedWordStyles.Where(x => x.Start == index).OrderByDescending(x => x.Priority).ToArray();
-			var ends = mergedWordStyles.Where(x => x.End + 1 == index).OrderByDescending(x => x.Priority).ToArray();
+			var starts = startsLookup[index].OrderByDescending(x => x.Priority).ToArray();
+			var ends = endsLookup[index].OrderByDescending(x => x.Priority).ToArray();
 
 			// 今回終了
 			foreach (var end in ends) {
