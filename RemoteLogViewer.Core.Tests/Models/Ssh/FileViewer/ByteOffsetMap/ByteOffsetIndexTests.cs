@@ -10,8 +10,8 @@ public class ByteOffsetIndexTests {
 		var index = new ByteOffsetIndex();
 
 		index.Count.ShouldBe(0);
-		index.Find(0).ShouldBe(new(0, 0));
-		index.Find(10).ShouldBe(new(0, 0));
+		index.Find(0).ShouldBe(new(1, 1));
+		index.Find(10).ShouldBe(new(1, 1));
 	}
 
 	[Fact]
@@ -23,7 +23,7 @@ public class ByteOffsetIndexTests {
 		index.Count.ShouldBe(2);
 
 		// targetLine が最初のエントリと等しい場合は、条件が "< targetLine"なので既定値が返る
-		index.Find(5).ShouldBe(new(0, 0));
+		index.Find(5).ShouldBe(new(1, 1));
 		// targetLine が5 と10 の間なら行5 のエントリが返る
 		index.Find(7).ShouldBe(new(5, 50));
 		// targetLine が10 と等しい場合も行5 のエントリが返る
@@ -40,7 +40,7 @@ public class ByteOffsetIndexTests {
 
 		index.Count.ShouldBe(3);
 
-		index.Find(1).ShouldBe(new(0, 0));
+		index.Find(1).ShouldBe(new(1, 1));
 		index.Find(3).ShouldBe(new(2, 20));
 		index.Find(6).ShouldBe(new(5, 55));
 		index.Find(10).ShouldBe(new(9, 99));
@@ -55,6 +55,6 @@ public class ByteOffsetIndexTests {
 
 		index.Reset();
 		index.Count.ShouldBe(0);
-		index.Find(100).ShouldBe(new(0, 0));
+		index.Find(100).ShouldBe(new(1, 1));
 	}
 }
