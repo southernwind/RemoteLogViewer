@@ -27,7 +27,7 @@ public class HighlightServiceBenchmark {
 
 		// Setup many rules
 		var highlightSettings = settingsStore.SettingsModel.HighlightSettings;
-		for (int i = 0; i < 100; i++) {
+		for (var i = 0; i < 100; i++) {
 			var rule = highlightSettings.AddRule();
 			var condition = rule.AddCondition();
 			condition.Pattern.Value = $"test{i}";
@@ -41,13 +41,13 @@ public class HighlightServiceBenchmark {
 		var content = string.Join(" ", Enumerable.Range(0, 1000).Select(i => $"test{i % 100}"));
 
 		// Warmup
-		for (int i = 0; i < 10; i++) {
+		for (var i = 0; i < 10; i++) {
 			highlightService.CreateStyledLine(content);
 		}
 
 		var sw = Stopwatch.StartNew();
-		int iterations = 100;
-		for (int i = 0; i < iterations; i++) {
+		var iterations = 100;
+		for (var i = 0; i < iterations; i++) {
 			highlightService.CreateStyledLine(content);
 		}
 		sw.Stop();
