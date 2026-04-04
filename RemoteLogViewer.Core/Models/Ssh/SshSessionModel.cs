@@ -97,7 +97,8 @@ public class SshSessionModel : ModelBase<SshSessionModel> {
 	/// </summary>
 	public void Connect(bool isReconnect = false) {
 		if (this.SelectedSshConnectionInfo.Value is not { } ci) {
-			return; //TODO: エラー通知
+			this._notificationService.Publish("SSH", "接続先が選択されていません。", NotificationSeverity.Error);
+			return;
 		}
 		try {
 			this._sshService.Connect(ci.Host.Value, ci.Port.Value, ci.User.Value, ci.Password.Value, ci.PrivateKeyPath.Value, ci.PrivateKeyPassphrase.Value, ci.EncodingString.Value);
@@ -194,7 +195,8 @@ public class SshSessionModel : ModelBase<SshSessionModel> {
 	/// </summary>
 	public void TestConnect() {
 		if (this.SelectedSshConnectionInfo.Value is not { } ci) {
-			return; //TODO: エラー通知
+			this._notificationService.Publish("SSH", "接続先が選択されていません。", NotificationSeverity.Error);
+			return;
 		}
 		this._sshService.Connect(ci.Host.Value, ci.Port.Value, ci.User.Value, ci.Password.Value, ci.PrivateKeyPath.Value, ci.PrivateKeyPassphrase.Value, ci.EncodingString.Value);
 		this.Disconnect();
