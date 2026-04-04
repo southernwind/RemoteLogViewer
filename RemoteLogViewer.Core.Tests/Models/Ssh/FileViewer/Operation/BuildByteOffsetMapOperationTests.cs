@@ -18,7 +18,7 @@ public class BuildByteOffsetMapOperationTests {
 		var subject = new Subject<ByteOffset>();
 
 		var sshMock = new Mock<ISshService>();
-		sshMock.Setup(s => s.CreateByteOffsetMap("file.log", 100, null, It.IsAny<CancellationToken>())).Returns((string _, int _, CancellationToken t) => subject.ToAsyncEnumerable(t));
+		sshMock.Setup(s => s.CreateByteOffsetMap("file.log", 100, null, It.IsAny<CancellationToken>())).Returns((string _, int _, ByteOffset? _, CancellationToken t) => subject.ToAsyncEnumerable(t));
 
 		using var opRegistry = new OperationRegistry();
 		var loggerMock = new Mock<ILogger<BuildByteOffsetMapOperation>>();
@@ -93,7 +93,7 @@ public class BuildByteOffsetMapOperationTests {
 		var subject = new Subject<ByteOffset>();
 
 		var sshMock = new Mock<ISshService>();
-		sshMock.Setup(s => s.CreateByteOffsetMap("file.log", 100, null, It.IsAny<CancellationToken>())).Returns((string _, int _, CancellationToken t) => subject.ToAsyncEnumerable(t));
+		sshMock.Setup(s => s.CreateByteOffsetMap("file.log", 100, null, It.IsAny<CancellationToken>())).Returns((string _, int _, ByteOffset? _, CancellationToken t) => subject.ToAsyncEnumerable(t));
 
 		using var opRegistry = new OperationRegistry();
 		var loggerMock = new Mock<ILogger<BuildByteOffsetMapOperation>>();
