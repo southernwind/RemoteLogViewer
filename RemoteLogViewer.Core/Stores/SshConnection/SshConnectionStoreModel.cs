@@ -18,6 +18,7 @@ namespace RemoteLogViewer.Core.Stores.SshConnection;
 public class SshConnectionStoreModel {
 	private readonly ILogger _logger;
 	private readonly WorkspaceService _workspaceService;
+	private readonly NotificationService _notificationService;
 	private readonly IServiceProvider _serviceProvider;
 	private string FilePath {
 		get {
@@ -33,9 +34,10 @@ public class SshConnectionStoreModel {
 		private set;
 	}
 
-	public SshConnectionStoreModel(WorkspaceService workspaceService, IServiceProvider serviceProvider, ILogger<SshConnectionStoreModel> logger) {
+	public SshConnectionStoreModel(WorkspaceService workspaceService, NotificationService notificationService, IServiceProvider serviceProvider, ILogger<SshConnectionStoreModel> logger) {
 		this._logger = logger;
 		this._workspaceService = workspaceService;
+		this._notificationService = notificationService;
 		this._serviceProvider = serviceProvider;
 		this.Load();
 	}
@@ -56,7 +58,7 @@ public class SshConnectionStoreModel {
 				}
 			}
 		} catch (Exception ex) {
-			// TODO: 失敗通知
+			this._notificationService.Publish("SSH接続設定", $"設定の読み込みに失敗しました: {ex.Message}", NotificationSeverity.Error, ex);
 			this._logger.LogWarning(ex, "Failed to load connections settings from {FilePath}", this.FilePath);
 		}
 
@@ -72,7 +74,7 @@ public class SshConnectionStoreModel {
 			var json = JsonSerializer.Serialize(SshConnectionProfileModelForJson.CreateJson(this.Profile), SshConnectionJsonSerializerContext.Default.SshConnectionProfileModelForJson);
 			File.WriteAllText(this.FilePath, json);
 		} catch (Exception ex) {
-			// TODO: 失敗通知
+			this._notificationService.Publish("SSH接続設定", $"設定の保存に失敗しました: {ex.Message}", NotificationSeverity.Error, ex);
 			this._logger.LogWarning(ex, "Failed to save connections settings to {FilePath}", this.FilePath);
 		}
 	}
