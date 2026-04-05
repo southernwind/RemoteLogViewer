@@ -69,14 +69,12 @@ public class SaveRangeContentOperationTests {
 		using var writer = new StreamWriter(ms, new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false), leaveOpen: true);
 		var task = op.ExecuteAsync(sshMock.Object, "file.log", writer, 1, 5, null, cts.Token);
 
-		try {
-			subject.OnNext(new TextLine(1, "A"));
-			subject.OnNext(new TextLine(2, "B"));
-			subject.OnNext(new TextLine(3, "C"));
-			await WaitUntilAsync(() => op.SavedLines.CurrentValue, 3);
-			cts.Cancel();
-			await task;
-		} catch (OperationCanceledException) { }
+		subject.OnNext(new TextLine(1, "A"));
+		subject.OnNext(new TextLine(2, "B"));
+		subject.OnNext(new TextLine(3, "C"));
+		await WaitUntilAsync(() => op.SavedLines.CurrentValue, 3);
+		cts.Cancel();
+		await task.ShouldThrowAsync<OperationCanceledException>();
 		await writer.FlushAsync();
 		var text = System.Text.Encoding.UTF8.GetString(ms.ToArray()).TrimEnd();
 
