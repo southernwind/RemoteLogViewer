@@ -140,7 +140,7 @@ public class HighlightService {
 		var endsLookup = mergedWordStyles.ToLookup(x => x.End + 1);
 
 		// スタイルの付け替えが発生する可能性のあるindexを列挙
-		foreach (var index in mergedWordStyles.SelectMany(x => new int[] { x.Start, x.End + 1 }).OrderBy(x => x).Distinct()) {
+		foreach (var index in mergedWordStyles.Select(x => x.Start).Concat(mergedWordStyles.Select(x => x.End + 1)).OrderBy(x => x).Distinct()) {
 			_ = sb.Append(Escape(content[(styledIndex + 1)..index]));
 			styledIndex = index - 1;
 
