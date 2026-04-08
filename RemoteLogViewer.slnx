@@ -44,6 +44,10 @@
     <BuildType Solution="Debug-Unpackaged|*" Project="Debug" />
     <BuildType Solution="Release-Unpackaged|*" Project="Release" />
   </Project>
+  <Project Path="RemoteLogViewer.Composition.Tests/RemoteLogViewer.Composition.Tests.csproj" Id="098c3284-8303-484e-87a1-dd7ca870adb6">
+    <BuildType Solution="Debug-Unpackaged|*" Project="Debug" />
+    <BuildType Solution="Release-Unpackaged|*" Project="Release" />
+  </Project>
   <Project Path="RemoteLogViewer.Core.Tests/RemoteLogViewer.Core.Tests.csproj" Id="15ab1059-0a93-4bfd-b38e-748a18fb3088">
     <BuildType Solution="Debug-Unpackaged|*" Project="Debug" />
     <BuildType Solution="Release-Unpackaged|*" Project="Release" />
